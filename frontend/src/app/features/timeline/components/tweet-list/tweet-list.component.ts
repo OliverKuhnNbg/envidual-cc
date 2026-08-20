@@ -1,4 +1,5 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Tweet } from '../../../../core/models/tweet.model';
 
 /*
@@ -10,6 +11,7 @@ import { Tweet } from '../../../../core/models/tweet.model';
 @Component({
   selector: 'app-tweet-list',
   standalone: true,
+  imports: [DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="d-flex flex-column gap-3" style="max-height: 75vh; overflow-y: auto;">
@@ -22,8 +24,11 @@ import { Tweet } from '../../../../core/models/tweet.model';
                 class="blockquote-footer mt-1 mb-0 text-muted"
                 style="font-size: 0.75rem; color:#474747;"
               >
-                Posted by <cite title="Author">&#64;{{ tweet.autor }}</cite>
-                <span class="text-muted"> {{ tweet.dateString | date: 'medium' }} </span>
+                Posted by <cite title="Author">&#64;{{ tweet.autor }}</cite
+                ><br />
+                <span class="text-muted">
+                  {{ tweet.dateString | date: 'dd.MM.yyyy, HH:mm' : 'Europe/Berlin' }}
+                </span>
               </footer>
             </blockquote>
           </div>
