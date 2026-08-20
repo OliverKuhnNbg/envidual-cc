@@ -55,4 +55,30 @@ export class TweetStore {
   public loadTimeline(): void {
     this.setSearchTerm('');
   }
+
+  /*
+   * ADR: Pessimistic State Mutation and Read-Model Synchronization
+   * Context: The store must handle aggregate creation while maintaining consistency with the server's source of truth (e.g., generated UUIDs, audit timestamps).
+   * Decision: Implemented a pessimistic mutation flow utilizing a direct subscription for write operations, bypassing the RxJS Subject stream used for reads.
+   * Rationale: Unlike search operations which benefit from debounce and cancellation (switchMap), a creation intent is a discrete command that must execute exactly once. Prepending the newly created aggregate directly to the local signal only AFTER a successful server response prevents complex compensating actions (rollbacks) in the UI layer if the HTTP POST fails.
+   */
+  public addTweet(payload: { content: string; author: string }): void {
+    this._isLoading.set(true);
+
+    this.api
+      .createTweet(payload)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to create tweet', error);
+          return of(null);
+        }),
+      )
+      .subscribe((newTweet) => {
+        this._isLoading.set(false);
+
+        if (newTweet) {
+          this._tweets.update((currentTweets) => [newTweet, ...currentTweets]);
+        }
+      });
+  }
 }

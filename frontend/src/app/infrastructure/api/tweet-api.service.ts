@@ -25,4 +25,12 @@ export class TweetApiService {
 
     return this.http.get<Tweet[]>(this.apiUrl, { params });
   }
+
+  createTweet(tweetData: { content: string; author: string }): Observable<Tweet> {
+    const payload = {
+      autor: tweetData.author,
+      message: tweetData.content,
+    };
+    return this.http.post<Tweet>(this.apiUrl, payload);
+  }
 }
