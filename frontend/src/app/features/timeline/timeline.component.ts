@@ -4,6 +4,7 @@ import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/cor
 import { TweetStore } from '../../core/state/tweet.store';
 import { TweetListComponent } from './components/tweet-list/tweet-list.component';
 import { TweetSearchComponent } from './components/tweet-search/tweet-search.component';
+import { TweetCreateComponent } from './components/tweet-create/tweet-create.component';
 
 /*
  * ADR: Smart Container with Delegated Search Actions
@@ -14,10 +15,11 @@ import { TweetSearchComponent } from './components/tweet-search/tweet-search.com
 @Component({
   selector: 'app-timeline',
   standalone: true,
-  imports: [TweetListComponent, TweetSearchComponent],
+  imports: [TweetListComponent, TweetSearchComponent, TweetCreateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div>
+      <div class="container"><app-tweet-create /></div>
       <div class="container"><app-tweet-search (search)="onSearch($event)" /></div>
       <div>
         <div class="container">
