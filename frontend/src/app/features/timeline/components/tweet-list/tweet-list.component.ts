@@ -23,6 +23,7 @@ import { Tweet } from '../../../../core/models/tweet.model';
                 style="font-size: 0.75rem; color:#474747;"
               >
                 Posted by <cite title="Author">&#64;{{ tweet.autor }}</cite>
+                <span class="text-muted"> {{ tweet.dateString | date: 'medium' }} </span>
               </footer>
             </blockquote>
           </div>
