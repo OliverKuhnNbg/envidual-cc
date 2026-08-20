@@ -1,31 +1,21 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { TimelineComponent } from './features/timeline/timeline.component';
 
 /*
- * ADR: Temporary Infrastructure Boundary Validation
- * Context: We need to prove that the Vite proxy and the Spring Boot backend communicate correctly before implementing the Domain-Driven Design stores.
- * Decision: Bypass the Clean Architecture layers temporarily. Inject the HttpClient directly into the dumb App Shell and log the payload to the browser console.
- * Consequence: This acts as an immediate fail-fast mechanism for the network layer. Once the 200 OK is verified, this must be refactored into a dedicated Infrastructure API Adapter.
+ * ADR: Root App Shell Migration
+ * Context: The diagnostic network check successfully proved that the Vite proxy and backend are fully operational.
+ * Decision: Replace the temporary diagnostic logging shell with the production-ready TimelineComponent.
+ * Consequence: Elevates the feature-level timeline component to the application root shell, connecting the UI layout directly to the reactive Signal Store and Infrastructure API adapters.
  */
 @Component({
   selector: 'app-root',
   standalone: true,
+  imports: [TimelineComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div style="padding: 2rem; font-family: sans-serif;">
-      <h2>System Diagnostics</h2>
-      <p>Bitte öffne die Entwicklertools (F12) und prüfe den "Console" Tab.</p>
-    </div>
+    <main class="min-vh-100 bg-light py-3">
+      <app-timeline />
+    </main>
   `,
 })
-export class App implements OnInit {
-  private readonly http = inject(HttpClient);
-
-  public ngOnInit(): void {
-    console.log('Initiating REST call to /api/tweets...');
-
-    this.http.get('/api/tweets').subscribe({
-      next: (response) => console.log('✅ BACKEND DATA RECEIVED:', response),
-      error: (err) => console.error('❌ NETWORK OR PROXY ERROR:', err),
-    });
-  }
-}
+export class App {}
