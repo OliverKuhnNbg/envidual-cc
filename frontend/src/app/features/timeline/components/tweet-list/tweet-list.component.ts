@@ -12,16 +12,26 @@ import { Tweet } from '../../../../core/models/tweet.model';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="list-group shadow-sm" style="max-height: 75vh; overflow-y: auto;">
+    <div class="d-flex flex-column gap-3" style="max-height: 75vh; overflow-y: auto;">
       @for (tweet of tweets(); track tweet.id) {
-        <div class="list-group-item list-group-item-action py-3">
-          <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-            <h6 class="mb-0 fw-bold text-primary">&#64;{{ tweet.autor }}</h6>
+        <div class="card shadow-sm border mb-2">
+          <div class="card-body">
+            <blockquote class="blockquote mb-0">
+              <p class="fs-6 mb-2 text-break">{{ tweet.message }}</p>
+              <footer
+                class="blockquote-footer mt-1 mb-0 text-muted"
+                style="font-size: 0.75rem; color:#474747;"
+              >
+                Posted by <cite title="Author">&#64;{{ tweet.autor }}</cite>
+              </footer>
+            </blockquote>
           </div>
-          <p class="mb-1 text-break">{{ tweet.message }}</p>
         </div>
+        <hr />
       } @empty {
-        <div class="text-center text-muted py-4">Keine Tweets gefunden.</div>
+        <div class="card shadow-sm border-0 text-center py-5">
+          <div class="card-body text-muted">Keine Tweets gefunden.</div>
+        </div>
       }
     </div>
   `,

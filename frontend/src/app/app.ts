@@ -10,10 +10,11 @@ import { TimelineComponent } from './features/timeline/timeline.component';
 @Component({
   selector: 'app-root',
   standalone: true,
+  styleUrls: ['./app.scss'],
   imports: [TimelineComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <main class="min-vh-100 bg-light py-3">
+    <main class="row col-md-6 offset-md-3">
       <app-timeline />
     </main>
   `,

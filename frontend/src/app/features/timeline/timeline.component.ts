@@ -14,7 +14,7 @@ import { TweetListComponent } from './components/tweet-list/tweet-list.component
   imports: [TweetListComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="container py-4" style="max-width: 680px;">
+    <div class="container">
       <h2 class="mb-4 text-center">Timeline</h2>
       <app-tweet-list [tweets]="store.filteredTweets()" />
     </div>
