@@ -1,6 +1,8 @@
 package com.envidual.tweets_app.infrastructure.web.dto;
 
 import com.envidual.tweets_app.domain.model.Tweet;
+
+import java.time.Instant;
 import java.util.UUID;
 
 /*
@@ -12,13 +14,15 @@ import java.util.UUID;
 public record TweetResponse(
         UUID id,
         String autor,
-        String message
+        String message,
+        Instant dateString
 ) {
     public static TweetResponse fromDomain(Tweet tweet) {
         return new TweetResponse(
                 tweet.getId(),
                 tweet.getAuthor(),
-                tweet.getContent()
+                tweet.getContent(),
+                tweet.getCreatedAt()
         );
     }
 }
