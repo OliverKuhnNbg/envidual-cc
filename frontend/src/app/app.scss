@@ -1,0 +1,12 @@
+/* src/styles.scss */
+
+// Optional: Hier kannst du eigene Bootstrap-Variablen überschreiben, BEVOR du Bootstrap importierst
+// $primary: #ff5722;
+
+// Bootstrap importieren
+@import '../..//node_modules/bootstrap/scss/bootstrap.scss';
+
+// Eigene globale Styles kommen nach dem Import
+body {
+  background-color: #f8f9fa;
+}
