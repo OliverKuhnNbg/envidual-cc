@@ -1,47 +1,58 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+// src/app/core/state/tweet.store.ts
+
+import { Injectable, signal, inject } from '@angular/core';
 import { Tweet } from '../models/tweet.model';
 import { TweetApiService } from '../../infrastructure/api/tweet-api.service';
-import { firstValueFrom } from 'rxjs';
+import { Subject, switchMap, debounceTime, distinctUntilChanged, tap, catchError, of } from 'rxjs';
 
 /*
- * ADR: In-Memory Client-Side Filtering via Computed Signals
- * Context: The application requires filtering tweets by keywords (message). We must decide between server-side query endpoints vs. reactive client-side filtering.
- * Decision: Fetch the timeline dataset once and derive the filtered list via an Angular computed() Signal.
- * Consequence: Delivers instant, latency-free search feedback on the client without firing repetitive network requests on every keystroke. This fits the initial 5000 records footprint perfectly.
+ * ADR: Reactive Server-Side Search State Management
+ * Context: The previous client-side filtering approach is obsolete since the backend now explicitly handles search queries via JPA.
+ * Decision: Transition the store to orchestrate server-side search requests utilizing an RxJS Subject stream with debounce logic, piping the results back into standard Angular Signals.
+ * Consequence: We prevent API flooding via debounceTime and handle race conditions via switchMap. The UI components consume the readonly signal synchronously, oblivious to the underlying asynchronous stream orchestration.
  */
 @Injectable({ providedIn: 'root' })
 export class TweetStore {
   private readonly api = inject(TweetApiService);
 
-  // Writable Signals
   private readonly _tweets = signal<Tweet[]>([]);
-  private readonly _searchTerm = signal<string>('');
+  private readonly _isLoading = signal<boolean>(false);
 
-  // Derived State (Read-Only)
-  public readonly searchTerm = this._searchTerm.asReadonly();
+  public readonly tweets = this._tweets.asReadonly();
+  public readonly isLoading = this._isLoading.asReadonly();
 
-  public readonly filteredTweets = computed(() => {
-    const term = this._searchTerm().trim().toLowerCase();
-    const allTweets = this._tweets();
+  private readonly searchSubject = new Subject<string>();
 
-    if (!term) {
-      return allTweets;
-    }
-
-    // Filter strictly by the 'message' property as requested
-    return allTweets.filter((tweet) => tweet.message.toLowerCase().includes(term));
-  });
-
-  public setSearchTerm(term: string): void {
-    this._searchTerm.set(term);
+  constructor() {
+    this.initSearchStream();
   }
 
-  public async loadTimeline(): Promise<void> {
-    try {
-      const data = await firstValueFrom(this.api.getTimeline());
-      this._tweets.set(data);
-    } catch (error) {
-      console.error('Timeline fetch failed', error);
-    }
+  private initSearchStream(): void {
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() => this._isLoading.set(true)),
+        switchMap((term) =>
+          this.api.getTimeline(term).pipe(
+            catchError((error) => {
+              console.error('Timeline fetch failed', error);
+              return of([]);
+            }),
+          ),
+        ),
+      )
+      .subscribe((data) => {
+        this._tweets.set(data);
+        this._isLoading.set(false);
+      });
+  }
+
+  public setSearchTerm(term: string): void {
+    this.searchSubject.next(term);
+  }
+
+  public loadTimeline(): void {
+    this.setSearchTerm('');
   }
 }

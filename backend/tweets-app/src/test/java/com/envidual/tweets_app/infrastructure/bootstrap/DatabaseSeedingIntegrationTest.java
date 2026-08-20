@@ -61,4 +61,22 @@ class DatabaseSeedingIntegrationTest {
         assertThat(secondMostRecent.getAuthor()).isEqualTo("OliverUser");
         assertThat(secondMostRecent.getContent()).isEqualTo("hello world 00002");
     }
+
+    @Test
+    void shouldFindAmountOfEntrys() {
+        String searchString = "hello";
+        List<Tweet> recentTweets = tweetRepository.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(searchString);
+        assertThat(recentTweets).isNotEmpty();
+        assertThat(recentTweets.size()).isEqualTo(5000);
+
+        searchString = "00001";
+        recentTweets = tweetRepository.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(searchString);
+        assertThat(recentTweets).isNotEmpty();
+        assertThat(recentTweets.size()).isEqualTo(1);
+
+        searchString = "0000";
+        recentTweets = tweetRepository.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(searchString);
+        assertThat(recentTweets).isNotEmpty();
+        assertThat(recentTweets.size()).isEqualTo(9);
+    }
 }
