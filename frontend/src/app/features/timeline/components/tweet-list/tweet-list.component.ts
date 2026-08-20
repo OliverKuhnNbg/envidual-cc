@@ -40,6 +40,10 @@ import { Tweet } from '../../../../core/models/tweet.model';
         </div>
       }
     </div>
+    <div style="padding-top: 30px;">
+      Gesamtanzahl der gefunden Einträge: <br />
+      {{ tweets().length }}
+    </div>
   `,
 })
 export class TweetListComponent {
