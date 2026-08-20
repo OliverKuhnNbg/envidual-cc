@@ -17,5 +17,8 @@ import java.util.UUID;
 public interface TweetRepository extends JpaRepository<Tweet, UUID> {
     
     List<Tweet> findAllByOrderByCreatedAtDesc();
+
+    // Spring Data generiert hieraus automatisch ein SQL ILIKE (Case-Insensitive Search)
+    List<Tweet> findByContentContainingIgnoreCaseOrderByCreatedAtDesc(String keyword);
     
 }
